@@ -5,6 +5,7 @@ from api.models.user import User, OAuthAccount, CustomerProfile
 from api.models.recipe import Recipe, Ingredient, RecipeIngredient
 from api.models.catalog import Product
 from api.models.commerce import CartItem, Order, OrderItem, Payment
+from api.models.planning import CalendarEntry, PantryItem
 from flask_admin.contrib.sqla import ModelView
 
 
@@ -25,3 +26,5 @@ def setup_admin(app):
     admin.add_view(ModelView(Order, db.session))
     admin.add_view(ModelView(OrderItem, db.session))
     admin.add_view(ModelView(Payment, db.session))
+    admin.add_view(ModelView(CalendarEntry, db.session))
+    admin.add_view(ModelView(PantryItem, db.session))

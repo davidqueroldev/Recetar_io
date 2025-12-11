@@ -1,14 +1,15 @@
 from api.database.db import db
 from sqlalchemy import String, Boolean
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(String(120), unique=True, nullable=False)
-    password = db.Column(String(128), nullable=False)
-    role = db.Column(String(50), nullable=False)
+    password = db.Column(String(500), nullable=False)
+    role = db.Column(String(50), default='customer', nullable=False)
     is_active = db.Column(Boolean(), default=True, nullable=False)
     created_at = db.Column(
         db.DateTime, default=datetime.utcnow, nullable=False)
@@ -22,11 +23,24 @@ class User(db.Model):
         "CustomerProfile", back_populates="user",
         cascade="all, delete-orphan")
 
+    def set_password(self, password):
+        """Hash and set the password"""
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password):
+        """Check if the provided password matches the hash"""
+        return check_password_hash(self.password, password)
+
     def serialize(self):
+        customer_profile = None
+        if self.customer_profiles:
+            customer_profile = self.customer_profiles[0].serialize()
+
         return {
             "id": self.id,
             "email": self.email,
-            # do not serialize the password, its a security breach
+            "role": self.role,
+            "customer_profile": customer_profile
         }
 
 
@@ -53,7 +67,8 @@ class OAuthAccount(db.Model):
 class CustomerProfile(db.Model):
     __tablename__ = 'customer_profile'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(
+        'user.id'), unique=True, nullable=False)
     height_cm = db.Column(db.Float, nullable=True)
     weight_kg = db.Column(db.Float, nullable=True)
     age = db.Column(db.Integer, nullable=True)

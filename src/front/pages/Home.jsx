@@ -42,16 +42,6 @@ export const Home = () => {
           alt="Rigo Baby"
         />
       </p>
-      <div className="bg-blue-100 border border-blue-300 text-blue-800 px-4 py-3 rounded mb-4 inline-block">
-        {store.message ? (
-          <span>{store.message}</span>
-        ) : (
-          <span className="text-red-600">
-            Loading message from the backend (make sure your python 🐍 backend
-            is running)...
-          </span>
-        )}
-      </div>
     </div>
   );
 };
